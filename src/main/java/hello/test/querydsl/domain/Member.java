@@ -3,40 +3,25 @@ package hello.test.querydsl.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter @Setter
-@ToString(of = {"id", "username", "age"})
 public class Member {
 
     @Id @GeneratedValue
     @Column(name = "member_id")
     private Long id;
 
-    private String username;
+    private String name;
 
     private Integer age;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "team_id")
-    private Team team;
+    @Embedded
+    private Address address;
 
-    public Member(String username) {
-        this(username,0);
-    }
+    @OneToMany(mappedBy = "member")
+    private List<Order> orders = new ArrayList<>();
 
-    public Member(String username, Integer age) {
-        this(username, age, null);
-    }
-
-    public Member(String username, Integer age, Team team) {
-        this.username = username;
-        this.age = age;
-        this.team = team;
-    }
-
-    public void changeTeam(Team team) {
-        this.team = team;
-        team.getMembers().add(this);
-    }
 }
