@@ -3,13 +3,11 @@ package hello.test.querydsl.api;
 import hello.test.querydsl.domain.Member;
 import hello.test.querydsl.service.MemberService;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -64,4 +62,31 @@ public class MemberApiController {
         return new CreateMemberResponse(id);
     }
 
+    /**
+     * 수정 API
+     *
+     * 회원 수정 API updateMemberV2 은 회원 정보를 부분 업데이트 한다. 여기서 PUT 방식을
+     * 사용했는데, PUT은 전체 업데이트를 할 때 사용하는 것이 맞다. 부분 업데이트를 하려면 PATCH를
+     * 사용하거나 POST를 사용하는 것이 REST 스타일에 맞다.
+     */
+    @PutMapping("/api/v2/members/{id}")
+    public UpdateMemberResponse updateMemberV2(@PathVariable("id") Long id,
+                                               @RequestBody @Valid UpdateMemberRequest request) {
+
+        memberService.update(id, request.getName());
+        Member findMember = memberService.findOne(id);
+        return new UpdateMemberResponse(findMember.getId(), findMember.getName());
+    }
+
+    @Data
+    static class UpdateMemberRequest {
+        private String name;
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class UpdateMemberResponse {
+        private Long id;
+        private String name;
+    }
 }
