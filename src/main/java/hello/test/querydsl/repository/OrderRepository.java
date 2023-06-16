@@ -86,9 +86,36 @@ public class OrderRepository {
         TypedQuery<Order> query = em.createQuery(cq).setMaxResults(1000); //최대 1000건
         return query.getResultList();
     }
-/*
-    public List<Order> findAll(OrderSearch orderSearch) {
+    public List<Order> findAll() {
 
+        String jpql = "select o From Order o";
+        TypedQuery<Order> query =
+                em.createQuery(jpql, Order.class)
+                        .setMaxResults(1000); //최대 1000건
+
+        return query.getResultList();
     }
-    */
+
+    /**
+     *
+     * 엔티티를 페치 조인(fetch join)을 사용해서 쿼리 1번에 조회
+     */
+    public List<Order> findAllWithMemberDelivery() {
+
+        return em.createQuery(
+                        "select o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d", Order.class)
+                .getResultList();
+    }
+
+    public List<Order> findAllWithItem() {
+        return em.createQuery(
+                        "select distinct o from Order o" +
+                                " join fetch o.member m" +
+                                " join fetch o.delivery d" +
+                                " join fetch o.orderItems oi" +
+                                " join fetch oi.item i", Order.class)
+                .getResultList();
+    }
 }
